@@ -25,7 +25,7 @@ export default function PublicLayout() {
               ) : (
                 <>
                   <Button as={Link} to="/login" variant="ghost" size="sm">Ver Agenda</Button>
-                  <Button as={Link} to="/registro" colorScheme="brand" size="sm">Crear cuenta</Button>
+                  <Button as={Link} to="/registro" colorScheme="brand" size="sm">Registrarse</Button>
                 </>
               )}
             </Flex>

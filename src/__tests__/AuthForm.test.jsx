@@ -8,7 +8,7 @@ describe('AuthForm', () => {
     const onSubmit = jest.fn();
     renderWithProviders(<AuthForm mode="login" onSubmit={onSubmit} />);
     await userEvent.type(screen.getByLabelText('Correo'), 'correo-malo');
-    await userEvent.type(screen.getByLabelText('Contrasena'), '123');
+    await userEvent.type(screen.getByLabelText('Contraseña'), '123');
     await userEvent.click(screen.getByRole('button', { name: 'Iniciar sesion' }));
     expect(screen.getByText('Escribe un correo valido')).toBeInTheDocument();
     expect(screen.getByText('Minimo 6 caracteres')).toBeInTheDocument();
@@ -19,7 +19,7 @@ describe('AuthForm', () => {
     const onSubmit = jest.fn();
     renderWithProviders(<AuthForm mode="login" onSubmit={onSubmit} />);
     await userEvent.type(screen.getByLabelText('Correo'), 'ana@correo.com');
-    await userEvent.type(screen.getByLabelText('Contrasena'), 'secreto1');
+    await userEvent.type(screen.getByLabelText('Contraseña'), 'secreto1');
     await userEvent.click(screen.getByRole('button', { name: 'Iniciar sesion' }));
     expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ email: 'ana@correo.com', password: 'secreto1' }));
   });
@@ -28,7 +28,7 @@ describe('AuthForm', () => {
     const onSubmit = jest.fn();
     renderWithProviders(<AuthForm mode="register" onSubmit={onSubmit} />);
     await userEvent.type(screen.getByLabelText('Correo'), 'ana@correo.com');
-    await userEvent.type(screen.getByLabelText('Contrasena'), 'secreto1');
+    await userEvent.type(screen.getByLabelText('Contraseña'), 'secreto1');
     await userEvent.type(screen.getByLabelText('Repite la contrasena'), 'otra-cosa');
     await userEvent.click(screen.getByRole('button', { name: 'Crear cuenta' }));
     expect(screen.getByText('Escribe tu nombre')).toBeInTheDocument();

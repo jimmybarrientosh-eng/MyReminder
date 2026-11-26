@@ -1,41 +1,89 @@
-// Pruebas de EventList con Jest y React Testing Library
-import { screen, within } from '@testing-library/react';
+
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import EventList from '../components/EventList';
+import { vi, describe, test, expect } from 'vitest';
+import AuthForm from '../components/AuthForm';
 import { renderWithProviders } from '../test-utils';
 
-const events = [
-  { id: '1', title: 'Informe', category: 'trabajo', start_at: '2030-01-15T10:00:00.000Z', reminder_minutes: 0 },
-  { id: '2', title: 'Cumpleaños', category: 'personal', start_at: '2030-02-01T18:00:00.000Z', reminder_minutes: 15 },
-];
+describe('AuthForm', () => {
+  test('login: valida correo y contrasena', async () => {
+    const onSubmit = vi.fn();
 
-describe('EventList', () => {
-  test('muestra el skeleton mientras carga', () => {
-    renderWithProviders(<EventList events={[]} loading onDelete={() => {}} />);
-    expect(screen.getByTestId('events-skeleton')).toBeInTheDocument();
+    renderWithProviders(
+      <AuthForm mode="login" onSubmit={onSubmit} />
+    );
+
+    await userEvent.type(screen.getByLabelText('Correo'), 'correo-malo');
+    await userEvent.type(screen.getByLabelText('Contraseña'), '123');
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Iniciar sesion' })
+    );
+
+    expect(screen.getByText('Escribe un correo valido')).toBeInTheDocument();
+    expect(screen.getByText('Minimo 6 caracteres')).toBeInTheDocument();
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  test('muestra el estado vacio con boton para crear', () => {
-    renderWithProviders(<EventList events={[]} loading={false} onDelete={() => {}} />);
-    expect(screen.getByText(/todavia no tienes eventos/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /crear evento/i })).toBeInTheDocument();
+  test('login: envia los datos cuando son validos', async () => {
+    const onSubmit = vi.fn();
+
+    renderWithProviders(
+      <AuthForm mode="login" onSubmit={onSubmit} />
+    );
+
+    await userEvent.type(screen.getByLabelText('Correo'), 'ana@correo.com');
+    await userEvent.type(screen.getByLabelText('Contraseña'), 'secreto1');
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Iniciar sesion' })
+    );
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: 'ana@correo.com',
+        password: 'secreto1',
+      })
+    );
   });
 
-  test('muestra un mensaje distinto cuando los filtros no encuentran nada', () => {
-    renderWithProviders(<EventList events={[]} loading={false} onDelete={() => {}} isFiltered />);
-    expect(screen.getByText(/ningun evento coincide/i)).toBeInTheDocument();
+  test('registro: exige nombre y que las contrasenas coincidan', async () => {
+    const onSubmit = vi.fn();
+
+    renderWithProviders(
+      <AuthForm mode="register" onSubmit={onSubmit} />
+    );
+
+    await userEvent.type(screen.getByLabelText('Correo'), 'ana@correo.com');
+    await userEvent.type(screen.getByLabelText('Contraseña'), 'secreto1');
+    await userEvent.type(
+      screen.getByLabelText('Repite la contrasena'),
+      'otra-cosa'
+    );
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Crear cuenta' })
+    );
+
+    expect(screen.getByText('Escribe tu nombre')).toBeInTheDocument();
+    expect(
+      screen.getByText('Las contraseñas no coinciden')
+    ).toBeInTheDocument();
+
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  test('pide confirmacion antes de eliminar', async () => {
-    const onDelete = jest.fn();
-    renderWithProviders(<EventList events={events} loading={false} onDelete={onDelete} />);
-    expect(screen.getByText('Informe')).toBeInTheDocument();
+  test('muestra el error que llega del servidor', () => {
+    renderWithProviders(
+      <AuthForm
+        mode="login"
+        onSubmit={() => {}}
+        error="Correo o contrasena incorrectos"
+      />
+    );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Eliminar Cumpleaños' }));
-    expect(onDelete).not.toHaveBeenCalled();
-
-    const dialog = await screen.findByRole('alertdialog');
-    await userEvent.click(within(dialog).getByRole('button', { name: 'Eliminar' }));
-    expect(onDelete).toHaveBeenCalledWith(events[1]);
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Correo o contrasena incorrectos'
+    );
   });
 });

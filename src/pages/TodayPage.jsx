@@ -122,7 +122,7 @@ export default function TodayPage() {
             )}
           </Panel>
           <Stack spacing={5}>
-            <Panel title="Manana" action={<Button as={RouterLink} to="/app/calendario" size="sm" variant="ghost">Calendario</Button>}>
+            <Panel title="Mañana" action={<Button as={RouterLink} to="/app/calendario" size="sm" variant="ghost">Calendario</Button>}>
               <Tomorrow events={tomorrow} />
             </Panel>
             <Panel title="Accesos rapidos">

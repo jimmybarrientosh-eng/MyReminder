@@ -48,7 +48,6 @@ function Sidebar({ user, pending, onLogout }) {
       <ChakraLink as={Link} to="/app" px={2} pt={1} _hover={{ textDecoration: 'none' }} aria-label="MyReminder, ir a mi agenda de hoy">
         <Logo />
       </ChakraLink>
-      <Button as={NavLink} to="/app/eventos/nuevo" colorScheme="brand" leftIcon={<PlusIcon boxSize={5} />} size="md">Nuevo evento</Button>
       <Stack as="nav" aria-label="Principal" spacing={1} flex="1">
         {NAV.map((item) => <SideLink key={item.to} item={item} pending={pending} />)}
       </Stack>
