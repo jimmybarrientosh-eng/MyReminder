@@ -1,0 +1,228 @@
+MYREMINDER - GUION DE EXPOSICION (10 MINUTOS) Y PREGUNTAS Y RESPUESTAS
+========================================================================
+
+ANTES DE EMPEZAR (2 minutos antes)
+- Servidor corriendo: npm run dev, y la landing abierta en el navegador.
+- Una cuenta ya preparada con 8 a 10 eventos: varios en los próximos 7 días, de las tres categorías,
+  uno de ellos con recordatorio a 5 minutos. Así el dashboard se ve lleno.
+- VS Code abierto con la carpeta src visible, y una pestaña con la tabla events de Supabase.
+- DevTools listo (F12 > Network) para simular "Offline".
+- Sesión cerrada, para poder mostrar el registro y el login.
+
+
+1. INTRODUCCION (1 minuto)
+MOSTRAR: la landing page.
+DECIR:
+"Buenos días, soy [tu nombre]. Les presento MyReminder, mi proyecto para el certificado de Front End
+con React. Es una aplicación para organizar eventos y recibir recordatorios antes de que empiecen.
+Su lema es: lo importante, a tiempo.
+Elegí el proyecto de gestión de eventos y recordatorios. Tiene registro e inicio de sesión, cada usuario
+ve solo sus eventos, y ofrece lista, calendario y un dashboard con gráficas.
+Las tecnologías son: React con Vite, React Router para la navegación, Context con useReducer para el
+estado, Chakra UI para el diseño, Supabase para la autenticación y la base de datos, y Jest con React
+Testing Library para las pruebas."
+
+
+2. EXPLICACION TECNICA (3 minutos)
+MOSTRAR: el árbol de carpetas de src en VS Code, y luego abrir cada archivo que menciones.
+DECIR:
+"La arquitectura tiene capas. En components y pages está la interfaz. En context está el estado global.
+En services está la comunicación con Supabase. En hooks están mis hooks personalizados, y en utils las
+funciones puras, como el cálculo de estadísticas del dashboard.
+
+El estado global usa dos contextos. AuthContext guarda la sesión. EventsContext guarda los eventos.
+Los dos usan useReducer: cada cambio es una acción como ADD, UPDATE o DELETE, y el reducer es una función
+pura, por eso es fácil de probar. Como lista, calendario y dashboard leen el mismo estado, siempre están
+sincronizados.
+
+La navegación usa React Router con rutas públicas, que son la landing, el login y el registro, y rutas
+privadas bajo /app. Un componente guardián redirige al login si no hay sesión y, después de entrar, te
+devuelve a donde ibas. Las páginas se cargan con lazy y Suspense para que la primera carga sea más liviana.
+
+Para la seguridad uso Supabase Auth y políticas RLS: la base de datos solo deja leer o modificar las filas
+cuyo user_id es el del usuario con sesión. Aunque alguien conozca la clave pública, no puede ver datos ajenos.
+
+Tengo 9 hooks personalizados, por ejemplo useReminders, que revisa cada 30 segundos si toca avisar, y
+useSyncOnReconnect, que envía los cambios hechos sin internet cuando vuelve la conexión.
+
+En calidad: 50 casos de prueba en 19 archivos. Cubren los reducers, los hooks, el formulario, la lista, el
+calendario, las gráficas, la paginación, el ErrorBoundary y una prueba de integración que verifica que el
+Context, el reducer y la página funcionan juntos."
+
+
+3. DEMOSTRACION EN VIVO (5 minutos)
+Cada paso lleva el tiempo aproximado entre paréntesis.
+
+ 1. (30 s) Landing: desplazar la página. DECIR: "Esta es la página de inicio: propuesta, funciones y
+    cómo funciona." Hacer clic en "Crear cuenta gratis".
+ 2. (40 s) Registro: enviar el formulario vacío para mostrar la validación. Luego crear una cuenta nueva.
+    DECIR: "El formulario valida correo, contraseña y que coincidan." Al entrar se ve el dashboard vacío.
+    DECIR: "Es el estado vacío: me dice qué hacer."
+ 3. (50 s) Crear evento: "Nuevo evento", enviar vacío para mostrar errores, y luego llenar título,
+    categoría, fecha y recordatorio. Guardar. DECIR: "Aparece el aviso de confirmación."
+ 4. (20 s) Cerrar sesión desde el menú de la esquina e iniciar sesión con la cuenta preparada.
+    DECIR: "Para ahorrar tiempo entro con una cuenta que ya tiene datos."
+ 5. (50 s) Dashboard: DECIR: "Aquí está el resumen: los números suben con una animación, las barras muestran
+    los próximos 7 días, el progreso por categoría y lo que viene." Recargar la página (F5) para mostrar
+    la barra roja superior y el skeleton mientras cargan los datos.
+ 6. (40 s) Eventos: escribir en el buscador, usar los chips de categoría, el contador "filtros activos" y
+    Limpiar, y cambiar de página. DECIR: "Filtro, orden y paginación sobre el mismo estado."
+ 7. (20 s) Calendario: cambiar de mes y pulsar Hoy. Abrir un evento desde el calendario.
+ 8. (20 s) Editar: cambiar el título y guardar. DECIR: "El mismo formulario sirve para crear y editar."
+ 9. (30 s) Eliminar: Eliminar > confirmar > Deshacer. DECIR: "Pide confirmación y, aun así, deja deshacer."
+10. (30 s) Sin conexión: F12 > Network > Offline. Crear un evento. Se ve la barra "Sin conexión". Volver
+    a Online. DECIR: "Guardó los cambios y los envió al volver la conexión."
+11. (15 s) Intentar abrir /app sin sesión (tras cerrar sesión): redirige al login.
+    DECIR: "Las rutas privadas están protegidas."
+Si te sobra tiempo: abrir la tabla events en Supabase y mostrar que los datos están ahí.
+
+
+4. CIERRE (1 minuto)
+DECIR:
+"En resumen, MyReminder cumple lo que pedía el proyecto: CRUD completo, recordatorios, categorías, vista de
+calendario, estado global con Context y useReducer, navegación con React Router, Chakra UI y pruebas con
+Jest y React Testing Library. Además agregué autenticación, seguridad por usuario, dashboard,
+funcionamiento sin conexión y atención a la accesibilidad.
+Lo que más aprendí fue a separar responsabilidades: interfaz, estado y datos. Eso me permitió agregar login y
+dashboard sin reescribir lo que ya funcionaba. Gracias, quedo atento a sus preguntas."
+
+
+PREGUNTAS Y RESPUESTAS
+------------------------------------------------------------------------
+
+P1. ¿Por qué usaste useReducer y no solo useState?
+R: Porque el estado de los eventos cambia de varias formas (cargar, agregar, editar, eliminar, error).
+Con un reducer cada cambio es una acción con nombre y la lógica queda en un solo lugar, es una función pura
+y se puede probar sin renderizar nada. Con useState tendría la lógica repartida por los componentes.
+
+P2. ¿Por qué Context y no Redux?
+R: La app tiene dos estados globales pequeños: sesión y eventos. Context con useReducer lo resuelve sin
+dependencias extra ni código repetitivo. Redux tendría sentido si el estado fuera muy grande, con muchos
+módulos o con herramientas de depuración avanzadas.
+
+P3. ¿Qué diferencia hay entre useMemo y useCallback, y dónde los usaste?
+R: useMemo guarda un valor calculado y useCallback guarda una función. Usé useMemo para la lista filtrada y
+ordenada, las estadísticas del dashboard y las celdas del calendario, para no recalcular si no cambian los
+datos. Usé useCallback en las acciones del contexto (agregar, editar, eliminar) para que mantengan la misma
+referencia entre renders.
+
+P4. ¿Para qué sirve useRef y dónde lo usaste?
+R: Guarda un valor que persiste entre renders sin provocar un nuevo render. Lo usé para enfocar el campo
+título al abrir el formulario, para recordar qué recordatorios ya mostré y no repetirlos, y como referencia
+del botón Cancelar del diálogo de confirmación.
+
+P5. ¿Qué es un custom hook y cuáles creaste?
+R: Es una función que empieza con "use" y reutiliza lógica con estado. Creé nueve: useAuth, useEvents,
+useDebounce, useReminders, useNotify, useOnlineStatus, useSyncOnReconnect, useDocumentTitle y useCountUp.
+Por ejemplo, useDebounce retrasa el valor del buscador 300 ms para no filtrar en cada tecla.
+
+P6. ¿Cómo funcionan las rutas protegidas?
+R: El componente RequireAuth lee la sesión con useAuth. Mientras se revisa, muestra una pantalla de carga; si
+no hay usuario, redirige a /login guardando la ruta de origen; si hay usuario, muestra la página. GuestOnly
+hace lo contrario para login y registro.
+
+P7. ¿Cómo manejas los formularios?
+R: Son controlados: el valor de cada campo vive en el estado. Al enviar valido, muestro errores por campo y
+los limpio cuando el usuario corrige. Uso noValidate para controlar los mensajes yo mismo, y al enviar solo
+mando los campos editables, nunca id ni fechas de creación.
+
+P8. ¿Cómo evitas que un usuario vea los eventos de otro?
+R: Con Row Level Security en Supabase. La tabla events tiene user_id, y las políticas solo permiten leer,
+crear, editar o borrar filas donde user_id sea igual a auth.uid(), el usuario de la sesión. La seguridad está
+en la base de datos y no depende del código del navegador.
+
+P9. ¿Es seguro tener la anon key en el front end?
+R: Sí, esa clave está diseñada para ser pública. Lo que protege los datos son las políticas RLS. Lo que nunca
+se debe exponer es la service_role key, y esa no está en el proyecto. El archivo .env tampoco se sube al
+repositorio.
+
+P10. ¿Qué es el modo demo y por qué no se usa en producción?
+R: Si no hay credenciales de Supabase, la app guarda cuentas y eventos en localStorage para poder practicar.
+No es seguro porque todo vive en el navegador de esa persona. Por eso para producción se usa Supabase.
+
+P11. ¿Qué pasa si se cae internet?
+R: La app avisa con una barra, guarda el cambio en una copia local y lo deja en una cola. Cuando vuelve la
+conexión los envía en el mismo orden y avisa que sincronizó. Es un comportamiento "offline first" básico.
+Funciona con Supabase, y evita enviar dos veces la misma cola.
+
+P12. ¿Cómo funcionan los recordatorios? ¿Tienen alguna limitación?
+R: El hook useReminders revisa cada 30 segundos los eventos y muestra un aviso cuando llega el momento
+elegido. La limitación es que funciona con la app abierta: no son notificaciones push. Como mejora, usaría
+un service worker con Web Push o correos programados desde Supabase.
+
+P13. ¿Qué pruebas hiciste y qué no cubren?
+R: Hay 50 casos en 19 archivos: reducers, hooks, formularios, lista, calendario, gráficas, paginación,
+ErrorBoundary y una prueba de integración con Context. No cubren el flujo completo en un navegador real ni
+la conexión real con Supabase; para eso agregaría pruebas end to end con Playwright o Cypress.
+
+P14. ¿Por qué elegiste Chakra UI?
+R: Trae componentes accesibles ya resueltos, como el diálogo de confirmación, el menú, las alertas y los
+skeletons, y un sistema de tema que me permitió definir mi paleta 60/30/10 en un solo archivo.
+
+P15. ¿Qué es el lazy loading y para qué lo usaste?
+R: Cargar el código de cada página solo cuando se visita. Uso React.lazy y Suspense, así el primer
+paquete es más pequeño y la landing carga más rápido. Mientras llega la página se muestra un indicador de
+carga.
+
+P16. ¿Qué es un ErrorBoundary?
+R: Un componente de clase que captura errores de renderizado de sus hijos. En vez de dejar la pantalla en
+blanco, muestra un mensaje amable con un botón para recargar.
+
+P17. ¿Por qué usas skeletons y no solo un spinner?
+R: El skeleton imita la forma del contenido que va a llegar, así la pantalla no "salta" cuando carga y el
+usuario percibe que es más rápida. Además hay una barra de progreso superior mientras se piden datos.
+
+P18. ¿Cómo cuidaste la accesibilidad?
+R: HTML semántico (header, nav, main, footer, un h1 por página), enlace "Saltar al contenido", etiquetas
+asociadas a cada campo, nombres claros en los botones ("Eliminar Informe"), roles ARIA en las gráficas, título
+de pestaña por vista, foco visible y animaciones que se apagan si el usuario pide reducir el movimiento.
+
+P19. ¿Cómo hiciste las gráficas y por qué sin librería?
+R: Con componentes propios: BarChart y CategoryBars. Para dos gráficas simples no justificaba sumar una
+dependencia pesada. Los datos vienen de computeStats, una función pura con pruebas, y las gráficas tienen
+una descripción para lectores de pantalla.
+
+P20. ¿Qué es React.memo y dónde lo usaste?
+R: Evita volver a renderizar un componente si sus props no cambiaron. Lo usé en EventCard, porque la lista
+puede tener varias tarjetas y no quiero redibujarlas todas cada vez que cambia un filtro o se abre el diálogo.
+
+P21. ¿Qué es el debounce?
+R: Esperar un momento después de la última tecla antes de actuar. En el buscador espera 300 ms, así no se
+filtra la lista en cada letra.
+
+P22. ¿Cómo manejas los errores del servidor?
+R: En el servicio, cada llamada revisa el error y lo convierte en un mensaje. En la interfaz se muestra una
+alerta con "Reintentar" al cargar, y un aviso claro al guardar o eliminar. En el login los errores de
+Supabase se traducen a mensajes comprensibles, como "Correo o contraseña incorrectos".
+
+P23. ¿Cuál fue la parte más difícil?
+R: La sincronización sin conexión: tenía que guardar los cambios, mantener el orden de las operaciones,
+evitar enviarlos dos veces y no mezclar los datos de distintos usuarios. Lo resolví con una cola por
+usuario y una única sincronización a la vez.
+
+P24. ¿Qué mejorarías con más tiempo?
+R: Notificaciones push reales, pruebas end to end, arrastrar y soltar eventos en el calendario, eventos
+repetitivos (por ejemplo, cada semana) y compartir eventos con otras personas.
+
+P25. ¿Qué aprendiste?
+R: A separar la interfaz, el estado y los datos en capas, a diseñar los estados de la interfaz (vacío,
+cargando, error, sin conexión) y a probar la lógica por separado. Eso hizo mucho más fácil agregar login y
+dashboard sin romper lo anterior.
+
+P26. ¿Por qué elegiste este proyecto?
+R: Porque combina todo lo que pedía el certificado: formularios, listados con filtros, calendario, estado
+global, rutas y pruebas, y además es una aplicación que realmente usaría.
+
+
+SI ALGO FALLA EN VIVO (PLAN B)
+- Se cae internet o Supabase: DECIR "Voy a mostrarlo en modo sin conexión, que es justo una de las
+  funciones", y continuar con lo que ya está cargado.
+- Un error en pantalla: recargar con F5. Si persiste, mostrar el código y los tests en VS Code.
+- Se te olvida algo: respira, mira el guion de este archivo y sigue con el siguiente paso.
+
+
+CONSEJOS
+- Habla despacio y mira al evaluador, no a la pantalla.
+- Ensaya con cronómetro al menos 3 veces: la demo debe terminar antes del minuto 9.
+- Si no sabes una pregunta, di: "No lo implementé, pero lo resolvería así...". Es mejor que inventar.
+- Termina siempre la respuesta conectándola con tu proyecto: "y en MyReminder lo usé en...".
